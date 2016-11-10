@@ -75,7 +75,7 @@ namespace RandomPasswordGenerator
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "api/{controller=Password}/{id?}");
+                    template: "api/{controller}/{id?}");
             });
 
             

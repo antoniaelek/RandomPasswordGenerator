@@ -1,0 +1,94 @@
+# Login [/Login]
+## Login [POST]
+Login user to an existing account.
+
++ Request (application/json)
+
+        {
+            "email": "user@mail.com",
+            "password": "Password"
+        }
+
+    + Schema
+
+            {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "email",
+                "password"
+              ]
+            }
+
++ Response 200 (application/json; charset=utf-8)
+    + Body
+
+            {
+              "success": true,
+              "name": "user",
+              "id": "527c4104-f8c5-4022-8291-f84025482c26",
+              "Email": "user@mail.com",
+              "dateCreated": "2016-11-10T18:58:00.99815"
+            }
+
+    + Schema
+
+            {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "dateCreated": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "success",
+                "name",
+                "id",
+                "email",
+                "dateCreated"
+              ]
+            }
+
++ Response 400 (application/json; charset=utf-8)
+    + Body
+
+            {
+              "success": false
+            }
+
+    + Schema
+
+
+            {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "success"
+              ]
+            }
