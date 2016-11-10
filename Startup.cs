@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -54,10 +53,6 @@ namespace RandomPasswordGenerator
             services.AddMvcCore();
 
             services.AddOptions();
-
-            // TO DO
-            //services.Configure<SmtpClientConfiguration>(Configuration.GetSection("SMTP"));
-            //services.AddTransient<IEmailSender, AuthMessageSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,7 +75,7 @@ namespace RandomPasswordGenerator
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "api/{controller=Home}/{action=Index}/{id?}");
+                    template: "api/{controller=Password}/{id?}");
             });
 
             
