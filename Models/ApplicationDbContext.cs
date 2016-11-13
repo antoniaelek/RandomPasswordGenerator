@@ -28,6 +28,7 @@ namespace RandomPasswordGenerator.Models
             
             // Unique
             builder.Entity<ApplicationUser>().HasIndex(u => u.Email).IsUnique();
+            builder.Entity<ApplicationUser>().HasIndex(b => b.Name).IsUnique();
         }
 
         public DbSet<Password> Password { get; set; }

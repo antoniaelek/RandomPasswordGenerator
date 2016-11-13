@@ -33,9 +33,9 @@ Login user to an existing account.
 
             {
               "success": true,
-              "name": "user",
               "id": "527c4104-f8c5-4022-8291-f84025482c26",
-              "Email": "user@mail.com",
+              "name": "user",
+              "email": "user@mail.com",
               "dateCreated": "2016-11-10T18:58:00.99815"
             }
 
@@ -48,10 +48,10 @@ Login user to an existing account.
                 "success": {
                   "type": "boolean"
                 },
-                "name": {
+                "id": {
                   "type": "string"
                 },
-                "id": {
+                "name": {
                   "type": "string"
                 },
                 "email": {
@@ -75,7 +75,7 @@ Login user to an existing account.
 
             {
               "success": false,
-              "verbose": "Invalid username or password."
+              "verbose": {}
             }
 
     + Schema
@@ -89,10 +89,11 @@ Login user to an existing account.
                   "type": "boolean"
                 },
                 "verbose": {
-                  "type": "string"
+                  "type": "object"
                 }
               },
               "required": [
-                "success"
+                "success",
+                "verbose"
               ]
             }

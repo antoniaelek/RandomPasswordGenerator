@@ -80,7 +80,7 @@ Register a new user account.
 
             {
               "success": false,
-              "verbose": "Registration unsuccessful." 
+              "verbose": {} 
             }
 
     + Schema
@@ -94,10 +94,11 @@ Register a new user account.
                   "type": "boolean"
                 },
                 "verbose": {
-                  "type": "string"
+                  "type": "object"
                 }
               },
               "required": [
-                "success"
+                "success",
+                "verbose"
               ]
             }
