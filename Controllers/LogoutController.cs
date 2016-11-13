@@ -7,6 +7,7 @@ using RandomPasswordGenerator.Models;
 
 namespace RandomPasswordGenerator
 {
+    [Route("api/[controller]/")]
     public class LogoutController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -50,7 +51,13 @@ namespace RandomPasswordGenerator
                     });
                 }
             }
-            var ret = new JsonResult(new { Success = false });
+            if (!ModelState.Keys.Any()) 
+            {
+                ModelState.AddModelError("Password","Invalid email or password.");
+                ModelState.AddModelError("Email","Invalid email or password.");
+            }
+            var allErrors = ModelState.ValidationErrors();
+            var ret = new JsonResult(new { Success = false, Verbose = allErrors });
             ret.StatusCode = 400;
             return ret;
         }

@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using RandomPasswordGenerator.Models;
 using RandomPasswordGenerator.ViewModels;
@@ -51,8 +54,12 @@ namespace RandomPasswordGenerator
                         DateCreated = user.DateCreated,
                     });
                 }
+            
             }
-            var ret = new JsonResult(new { Success = false });
+            if (!ModelState.Keys.Any()) 
+                ModelState.AddModelError("Email","There already exists an account with that email.");
+            var allErrors = ModelState.ValidationErrors();
+            var ret = new JsonResult(new { Success = false, Verbose = allErrors});
             ret.StatusCode = 400;
             return ret;
         }

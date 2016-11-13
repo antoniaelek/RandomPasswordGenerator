@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using ModelBuilder = Microsoft.EntityFrameworkCore.ModelBuilder;
 
@@ -21,6 +22,14 @@ namespace RandomPasswordGenerator.Models
             // Add your customizations after calling base.OnModelCreating(builder);
 
             builder.HasPostgresExtension("uuid-ossp");
-        }        
+
+            // Cascade delete when deleting group
+            builder.Entity<ApplicationUser>().HasMany(u => u.Passwords).WithOne(p=>p.User).OnDelete(DeleteBehavior.Cascade);
+            
+            // Unique
+            builder.Entity<ApplicationUser>().HasIndex(u => u.Email).IsUnique();
+        }
+
+        public DbSet<Password> Password { get; set; }
     }
 }

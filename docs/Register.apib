@@ -79,7 +79,8 @@ Register a new user account.
     + Body
 
             {
-              "success": false
+              "success": false,
+              "verbose": "Registration unsuccessful." 
             }
 
     + Schema
@@ -91,6 +92,9 @@ Register a new user account.
               "properties": {
                 "success": {
                   "type": "boolean"
+                },
+                "verbose": {
+                  "type": "string"
                 }
               },
               "required": [

@@ -18,6 +18,7 @@ namespace RandomPasswordGenerator
                 .UseConfiguration(config)
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseUrls("http://*:5000") // listen on port 5000 on all network interfaces
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();

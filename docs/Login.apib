@@ -74,7 +74,8 @@ Login user to an existing account.
     + Body
 
             {
-              "success": false
+              "success": false,
+              "verbose": "Invalid username or password."
             }
 
     + Schema
@@ -86,6 +87,9 @@ Login user to an existing account.
               "properties": {
                 "success": {
                   "type": "boolean"
+                },
+                "verbose": {
+                  "type": "string"
                 }
               },
               "required": [
