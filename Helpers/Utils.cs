@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace RandomPasswordGenerator
@@ -18,6 +19,16 @@ namespace RandomPasswordGenerator
                 allErrors.Add(key,val.Errors.Select(err => err.ErrorMessage).FirstOrDefault());
             }
             return allErrors;
+        }
+
+        public static JsonResult ErrorStatusCode(this int status)
+        {
+            var ret = new JsonResult(new
+            {
+                Success = false
+            });
+            ret.StatusCode = status;
+            return ret;
         }
     }
 }

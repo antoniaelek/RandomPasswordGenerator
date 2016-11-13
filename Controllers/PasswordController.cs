@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -66,41 +67,29 @@ namespace RandomPasswordGenerator
             }
             else
             {
-                return new JsonResult(new
-                {
-                    Success = false
-                });
+                var allErrors = ModelState.ValidationErrors();
+                var ret = new JsonResult(new { Success = false, Verbose = allErrors});
+                ret.StatusCode = 400;
+                return ret;
             }
         }
 
         // GET: api/Password/{id}
-        [HttpGet]
+        [HttpGet("{id}")]
         [Authorize]
-        public async Task<JsonResult> Get(int id)
+        public async Task<JsonResult> Get([FromUri]int id)
         {
             // User null, how did we even get past the Authorize attribute?
             var user = await GetCurrentUser();
-            if (user == null)
-                return new JsonResult(new
-                {
-                    Success = false
-                });
-            
+            if (user == null) return 401.ErrorStatusCode();
+                
             var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
             
             // Password with the given id doesn't exist
-            if (pass == null)
-                return new JsonResult(new
-                {
-                    Success = false
-                });
-            
+            if (pass == null) return 404.ErrorStatusCode();
+
             // This user has no right to fetch this password
-            if (pass.UserId != user.Id)
-                return new JsonResult(new
-                {
-                    Success = false
-                });
+            if (pass.UserId != user.Id) return 401.ErrorStatusCode();
 
             // All was well
             return new JsonResult(new
