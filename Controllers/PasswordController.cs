@@ -86,10 +86,42 @@ namespace RandomPasswordGenerator
             }
         }
 
+        // DELETE: api/Password/{id}
+        [HttpDelete("{id}")]
+        public async Task<JsonResult> Delete(int id)
+        {
+            var isAuthorized = await CheckUserAuthorized(id);
+            if (isAuthorized.StatusCode != 200) return isAuthorized;
+
+            // All was well
+            var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
+            _context.Password.Remove(pass);
+            _context.SaveChanges();
+            return 202.SuccessStatusCode();
+        }
+
         // GET: api/Password/{id}
         [HttpGet("{id}")]
         [Authorize]
         public async Task<JsonResult> Get([FromUri]int id)
+        {
+            var isAuthorized = await CheckUserAuthorized(id); 
+            if (isAuthorized.StatusCode != 200) return isAuthorized;
+            
+            // All was well
+            var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
+            return new JsonResult(new
+            {
+                Success = true,
+                Id = pass.Id,
+                Password = Decrypt(pass.PasswordText),
+                Hint = pass.Hint,
+                UserId = pass.UserId,
+                DateCreated = pass.DateCreated
+            });
+        }
+
+        private async Task<JsonResult> CheckUserAuthorized(int id)
         {
             // User null, how did we even get past the Authorize attribute?
             var user = await GetCurrentUser();
@@ -102,17 +134,7 @@ namespace RandomPasswordGenerator
 
             // This user has no right to fetch this password
             if (pass.UserId != user.Id) return 401.ErrorStatusCode();
-
-            // All was well
-            return new JsonResult(new
-            {
-                Success = true,
-                Id = pass.Id,
-                Password = Decrypt(pass.PasswordText),
-                Hint = pass.Hint,
-                UserId = pass.UserId,
-                DateCreated = pass.DateCreated
-            });
+            return 200.SuccessStatusCode();
         }
 
         private async Task SavePassword(Password password, ApplicationUser user)

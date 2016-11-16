@@ -30,5 +30,15 @@ namespace RandomPasswordGenerator
             ret.StatusCode = status;
             return ret;
         }
+
+        public static JsonResult SuccessStatusCode(this int status)
+        {
+            var ret = new JsonResult(new
+            {
+                Success = true
+            });
+            ret.StatusCode = status;
+            return ret;
+        }
     }
 }
