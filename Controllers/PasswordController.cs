@@ -86,20 +86,6 @@ namespace RandomPasswordGenerator
             }
         }
 
-        // DELETE: api/Password/{id}
-        [HttpDelete("{id}")]
-        public async Task<JsonResult> Delete(int id)
-        {
-            var isAuthorized = await CheckUserAuthorized(id);
-            if (isAuthorized.StatusCode != 200) return isAuthorized;
-
-            // All was well
-            var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
-            _context.Password.Remove(pass);
-            _context.SaveChanges();
-            return 202.SuccessStatusCode();
-        }
-
         // GET: api/Password/{id}
         [HttpGet("{id}")]
         [Authorize]
@@ -119,6 +105,41 @@ namespace RandomPasswordGenerator
                 UserId = pass.UserId,
                 DateCreated = pass.DateCreated
             });
+        }
+
+        // PUT: api/Password/{id}
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<JsonResult> Put(int id, [FromBody]Password password)
+        {
+            var isAuthorized = await CheckUserAuthorized(id);
+            if (isAuthorized.StatusCode != 200) return isAuthorized;
+
+            // All was well
+            var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
+            
+            // Update old pass
+            pass.PasswordText = Encrypt(password.PasswordText);
+            pass.Hint = password.Hint;
+
+            // Save changes
+            _context.Password.Update(pass);
+            _context.SaveChanges();
+            return 202.SuccessStatusCode();
+        }
+
+        // DELETE: api/Password/{id}
+        [HttpDelete("{id}")]
+        public async Task<JsonResult> Delete(int id)
+        {
+            var isAuthorized = await CheckUserAuthorized(id);
+            if (isAuthorized.StatusCode != 200) return isAuthorized;
+
+            // All was well
+            var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
+            _context.Password.Remove(pass);
+            _context.SaveChanges();
+            return 202.SuccessStatusCode();
         }
 
         private async Task<JsonResult> CheckUserAuthorized(int id)
