@@ -8,6 +8,10 @@ namespace RandomPasswordGenerator.ViewModels
         public string Name { get; set; }
 
         [Required]
+        [Key]
+        public string UserName { get; set; }
+
+        [Required]
         [EmailAddress]
         public string Email { get; set; }
 

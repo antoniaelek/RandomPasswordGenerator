@@ -31,15 +31,26 @@ namespace RandomPasswordGenerator
         [AllowAnonymous]
         public async Task<JsonResult> Post([FromBody]LoginViewModel viewModel)
         {
+            if (viewModel.UserName == null && viewModel.Email == null)
+            {
+                ModelState.AddModelError("Email","Email or Username field is requried.");
+                ModelState.AddModelError("Username","Email or Username field is requried.");
+            }
             if (ModelState.IsValid)
             {
+                ApplicationUser user = null;
+                if (viewModel.Email != null) user = await _userManager.FindByEmailAsync(viewModel.Email);
+                else if (viewModel.UserName != null || 
+                         (user == null && viewModel.UserName != null)) 
+                    user = await _userManager.FindByNameAsync(viewModel.UserName);
+
                 var result = await _signInManager.
-                    PasswordSignInAsync(viewModel.Email,
+                    PasswordSignInAsync(user.UserName,
                                         viewModel.Password,
                                         viewModel.IsPersistent, false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(viewModel.Email);
+                    user = await _userManager.FindByEmailAsync(user.Email);
                     var tmp = _userManager.GetRolesAsync(user);
                     return new JsonResult(new
                     {

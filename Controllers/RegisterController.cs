@@ -37,7 +37,7 @@ namespace RandomPasswordGenerator
             {
                 var user = new ApplicationUser
                 {
-                    UserName = viewModel.Email,
+                    UserName = viewModel.UserName,
                     Email = viewModel.Email,
                     Name = viewModel.Name
                 };
@@ -49,6 +49,7 @@ namespace RandomPasswordGenerator
                     return new JsonResult(new {
                         Success = true,
                         Id = user.Id,
+                        UserName = user.UserName,
                         Name = user.Name,
                         Email = user.Email,
                         DateCreated = user.DateCreated,

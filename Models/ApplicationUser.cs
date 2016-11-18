@@ -13,7 +13,7 @@ namespace RandomPasswordGenerator.Models
         
         [Required]
         public string Name { get; set; }
-
+        
         public ICollection<Password> Passwords { get; set; } = new HashSet<Password>();
 
         public ApplicationUser()
