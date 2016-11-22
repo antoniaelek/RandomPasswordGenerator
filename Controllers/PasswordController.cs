@@ -25,7 +25,6 @@ namespace RandomPasswordGenerator
         private string _upperChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private string _digit = "1234567890";
         private string _nonAlphaNum = "!@#$%^&*()_-+=[{]};:<>|./?";
-
         private IConfigurationRoot _configuration;
 
         public PasswordController(ApplicationDbContext context,
@@ -48,7 +47,7 @@ namespace RandomPasswordGenerator
             if (ModelState.IsValid)
             {
                 var plain = new string(GetRandomPass(viewModel));
-                var encrypted = Encrypt(plain);
+                var encrypted = plain.Encrypt(_configuration.GetConnectionString("Enc"));
                 var password = new Password()
                 {
                     PasswordText = encrypted,
@@ -100,7 +99,7 @@ namespace RandomPasswordGenerator
             {
                 Success = true,
                 Id = pass.Id,
-                Password = Decrypt(pass.PasswordText),
+                Password = pass.PasswordText.Decrypt(_configuration.GetConnectionString("Enc")),
                 Hint = pass.Hint,
                 UserId = pass.UserId,
                 DateCreated = pass.DateCreated
@@ -119,7 +118,7 @@ namespace RandomPasswordGenerator
             var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
             
             // Update old pass
-            pass.PasswordText = Encrypt(password.PasswordText);
+            pass.PasswordText = password.PasswordText.Encrypt(_configuration.GetConnectionString("Enc"));
             pass.Hint = password.Hint;
 
             // Save changes
@@ -205,48 +204,6 @@ namespace RandomPasswordGenerator
                 gen.GetBytes(data);
                 return BitConverter.ToUInt16(data, 0) % max;
             }
-        }
-        
-        private string Encrypt(string clearText)
-        {
-            var EncryptionKey = _configuration.GetConnectionString("Enc");
-            byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
-            using (Aes encryptor = Aes.Create())
-            {
-                var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (var ms = new MemoryStream())
-                {
-                    using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(clearBytes, 0, clearBytes.Length);
-                    }
-                    clearText = Convert.ToBase64String(ms.ToArray());
-                }
-            }
-            return clearText;
-        }
-
-        private string Decrypt(string cipherText)
-        {
-            var EncryptionKey = _configuration.GetConnectionString("Enc");
-            byte[] cipherBytes = Convert.FromBase64String(cipherText);
-            using (Aes encryptor = Aes.Create())
-            {
-                var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (var ms = new MemoryStream())
-                {
-                    using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(cipherBytes, 0, cipherBytes.Length);
-                    }
-                    cipherText = Encoding.Unicode.GetString(ms.ToArray());
-                }
-            }
-            return cipherText;
         }
     }
 }
