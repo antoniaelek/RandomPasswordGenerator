@@ -56,7 +56,7 @@ namespace RandomPasswordGenerator
                     Hint = viewModel.Hint
                 };
 
-                var user = await GetCurrentUser();
+                var user = await _userManager.GetUser(User.Identity.Name);
                 if (user == null)
                     return new JsonResult(new
                     {
@@ -145,7 +145,7 @@ namespace RandomPasswordGenerator
         private async Task<JsonResult> CheckUserAuthorized(int id)
         {
             // User null, how did we even get past the Authorize attribute?
-            var user = await GetCurrentUser();
+            var user = await _userManager.GetUser(User.Identity.Name);
             if (user == null) return 401.ErrorStatusCode();
                 
             var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
@@ -166,15 +166,6 @@ namespace RandomPasswordGenerator
             _context.Password.Add(password);
             
             await _context.SaveChangesAsync();
-        }
-
-        private async Task<ApplicationUser> GetCurrentUser()
-        {
-            var name = User.Identity.Name;
-            if (name == null) return null;
-            var user = await _userManager.FindByNameAsync(name);
-            if (user == null) return null;
-            return user;
         }
 
         private char[] GetRandomPass(PasswordViewModel viewModel)
