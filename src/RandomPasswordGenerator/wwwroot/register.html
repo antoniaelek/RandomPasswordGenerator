@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <script type="text/javascript" src="./lib/knockout/dist/knockout.js"></script>
+    <script type="text/javascript" src="./lib/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/jquery.validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="./lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./lib/bootstrap/dist/css/bootstrap.min.css" media="screen" />
+  </head>
+  <body>
+    <div class="container" id="reg-container">
+        <h1>Register</h1>
+        <hr/>
+        <form id="myform">
+            <div class="form-group row">
+                <label for="email" class="col-md-1 control-label" style="padding-top: 5px;">Email</label>
+                <div class="col-md-5">
+                    <input type="email" class="form-control col-md-9" id="email" placeholder="you@mail.com" 
+                    name="email" data-bind="value: email" required/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="username" class="col-md-1 control-label" style="padding-top: 5px;">Username</label>
+                <div class="col-md-5">
+                    <input type="username" class="form-control col-md-9" id="username" placeholder="username" 
+                    name="username" data-bind="value: username" required/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="name" class="col-md-1 control-label" style="padding-top: 5px;">Name</label>
+                <div class="col-md-5">
+                    <input type="name" class="form-control col-md-9" id="name" placeholder="Name" 
+                    name="name" data-bind="value: name" required/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="password" class="col-md-1 control-label" style="padding-top: 5px;">Password</label>
+                <div class="col-md-5">
+                    <input type="password" class="form-control col-md-9" id="password" placeholder="password" 
+                    name="password" data-bind="value: password" required/>
+                </div>
+            </div>
+
+            <button class="btn btn-success" data-bind="click: register">Register</button>
+            <button class="btn btn-info" onclick="location.href='/home.html';">Cancel</button>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+      
+      function RegisterViewModel() {
+        this.email = ko.observable("");
+        this.username = ko.observable("");
+        this.name = ko.observable("");
+        this.password = ko.observable("");
+
+        self.register = function() {
+            $("#myform").validate();
+            if ($('#myform').valid() == false) {
+                
+            }
+            else{
+                $.ajax("/api/user", {
+                    data: ko.toJSON({ 
+                        name: this.name, 
+                        username: this.username, 
+                        email: this.email, 
+                        password: this.password  
+                    }),
+                    type: "post", 
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log(result);
+                        $("#reg-container").hide();
+                        console.log(result.userName);
+                        window.location.replace("user.html?user="+result.userName);
+                    }
+                });
+            }
+        }; 
+
+      }
+
+      // Activates knockout.js
+      ko.applyBindings(new RegisterViewModel());
+    </script>
+  </body>
+</html>
