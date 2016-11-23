@@ -53,6 +53,8 @@ namespace RandomPasswordGenerator
             services.AddMvcCore();
 
             services.AddOptions();
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,7 +67,7 @@ namespace RandomPasswordGenerator
 
             DefaultFilesOptions options = new DefaultFilesOptions();
             options.DefaultFileNames.Clear();
-            options.DefaultFileNames.Add("index.html");
+            options.DefaultFileNames.Add("swagger/ui/index.html");
             app.UseDefaultFiles(options);
             app.UseStaticFiles();
 
@@ -73,12 +75,23 @@ namespace RandomPasswordGenerator
 
             app.UseMvc(routes =>
             {
+
+                routes.MapRoute(
+                    "root",
+                    "",
+                    new { controller = "Home", action = "Index", id = "" }
+                );
+
                 routes.MapRoute(
                     name: "default",
-                    template: "api/{controller}/{id?}");
+                    template: "api/{controller}/{id?}",
+                    defaults: new { controller = "Home" });
             });
 
             
+
+            app.UseSwagger();
+            app.UseSwaggerUi("home","/swagger/v1/swagger.json");
         }
     }
 }
