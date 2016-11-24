@@ -10,16 +10,18 @@ using Microsoft.Extensions.Configuration;
 using RandomPasswordGenerator.Models;
 using RandomPasswordGenerator.ViewModels;
 using System.Collections.Generic;
+using NLog;
 
 namespace RandomPasswordGenerator 
 {
     [Route("api/[controller]/")]
     public class UserController : Controller
     {
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private IConfigurationRoot _configuration;
 
         public UserController(ApplicationDbContext context,
@@ -44,6 +46,7 @@ namespace RandomPasswordGenerator
         [AllowAnonymous]
         public async Task<JsonResult> Get(string id)
         {
+            Logger.Fatal(this.Request.Log());
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == id);
             return new JsonResult(new
             {
@@ -61,6 +64,7 @@ namespace RandomPasswordGenerator
         [Authorize]
         public async Task<JsonResult> GetPasswords(string id)
         {
+            Logger.Fatal(this.Request.Log());
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == id);
             var isAuthorized = await CheckUserAuthorized(user.UserName);
             if (isAuthorized.StatusCode != 200) return isAuthorized;
@@ -85,6 +89,7 @@ namespace RandomPasswordGenerator
         [Authorize]
         public async Task Logout()
         {
+            Logger.Fatal(this.Request.Log());
             await _signInManager.SignOutAsync();
         }
 
@@ -93,6 +98,7 @@ namespace RandomPasswordGenerator
         [AllowAnonymous]
         public async Task<JsonResult> Register([FromBody]RegisterViewModel viewModel)
         {
+            Logger.Fatal(this.Request.Log());
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -130,6 +136,11 @@ namespace RandomPasswordGenerator
         [AllowAnonymous]
         public async Task<JsonResult> Login([FromBody]LoginViewModel viewModel)
         {
+            Logger.Fatal(this.Request.Log());
+            var key = this.Request.Headers.Keys.FirstOrDefault(h => h.ToLower() == "user-agent");
+            var browser =  "";
+            if (key != null) browser = this.Request.Headers[key];
+            Logger.Info(this.Request.Path + " " + browser);
             if (viewModel.UserName == null && viewModel.Email == null)
             {
                 ModelState.AddModelError("Email","Email or Username field is requried.");
@@ -174,6 +185,7 @@ namespace RandomPasswordGenerator
 
         private async Task<JsonResult> CheckUserAuthorized(string id)
         {
+            
             // User null, how did we even get past the Authorize attribute?
             var user = await _userManager.GetUser(User.Identity.Name);
             if (user == null) return 401.ErrorStatusCode();

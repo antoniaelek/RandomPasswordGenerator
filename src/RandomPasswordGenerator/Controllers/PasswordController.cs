@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using NLog;
 using RandomPasswordGenerator.Models;
 
 namespace RandomPasswordGenerator 
@@ -18,6 +19,7 @@ namespace RandomPasswordGenerator
     [Route("api/[controller]/")]
     public class PasswordController : Controller
     {
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -44,6 +46,7 @@ namespace RandomPasswordGenerator
         [AllowAnonymous]
         public async Task<JsonResult> Post([FromBody]PasswordViewModel viewModel)
         {
+            Logger.Fatal(this.Request.Log());
             if (ModelState.IsValid)
             {
                 var plain = new string(GetRandomPass(viewModel));
@@ -90,6 +93,7 @@ namespace RandomPasswordGenerator
         [Authorize]
         public async Task<JsonResult> Get([FromUri]int id)
         {
+            Logger.Fatal(this.Request.Log());
             var isAuthorized = await CheckUserAuthorized(id); 
             if (isAuthorized.StatusCode != 200) return isAuthorized;
             
@@ -111,6 +115,7 @@ namespace RandomPasswordGenerator
         [Authorize]
         public async Task<JsonResult> Put(int id, [FromBody]Password password)
         {
+            Logger.Fatal(this.Request.Log());
             var isAuthorized = await CheckUserAuthorized(id);
             if (isAuthorized.StatusCode != 200) return isAuthorized;
 
@@ -131,6 +136,7 @@ namespace RandomPasswordGenerator
         [HttpDelete("{id}")]
         public async Task<JsonResult> Delete(int id)
         {
+            Logger.Fatal(this.Request.Log());
             var isAuthorized = await CheckUserAuthorized(id);
             if (isAuthorized.StatusCode != 200) return isAuthorized;
 

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using RandomPasswordGenerator.Models;
 
 namespace RandomPasswordGenerator
@@ -98,6 +98,14 @@ namespace RandomPasswordGenerator
                 }
             }
             return cipherText;
+        }
+
+        public static string Log(this HttpRequest request)
+        {
+            var key = request.Headers.Keys.FirstOrDefault(h => h.ToLower() == "user-agent");
+            var browser =  "";
+            if (key != null) browser = request.Headers[key];
+            return request.Path + " " + browser;
         }
     }
 }

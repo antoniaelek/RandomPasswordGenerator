@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using RandomPasswordGenerator.Models;
 
 namespace RandomPasswordGenerator
@@ -62,6 +63,13 @@ namespace RandomPasswordGenerator
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            //add NLog to ASP.NET Core
+            loggerFactory.AddNLog();
+
+
+            //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
+            env.ConfigureNLog("nlog.config");
 
             //app.UseIISIntegration();
 
