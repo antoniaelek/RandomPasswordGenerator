@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using NLog;
 using RandomPasswordGenerator.Models;
 
-namespace RandomPasswordGenerator 
+namespace RandomPasswordGenerator
 {
     [Route("api/[controller]/")]
     public class PasswordController : Controller
@@ -113,7 +112,7 @@ namespace RandomPasswordGenerator
         // PUT: api/Password/{id}
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<JsonResult> Put(int id, [FromBody]Password password)
+        public async Task<JsonResult> Put(int id, [FromBody]UpdatePasswordViewModel password)
         {
             Logger.Fatal(this.Request.Log());
             var isAuthorized = await CheckUserAuthorized(id);
@@ -121,7 +120,9 @@ namespace RandomPasswordGenerator
 
             // All was well
             var pass = await _context.Password.FirstOrDefaultAsync(x => x.Id == id);
-            
+
+            if (pass == null) return 404.ErrorStatusCode();
+
             // Update old pass
             pass.PasswordText = password.PasswordText.Encrypt(_configuration.GetConnectionString("Enc"));
             pass.Hint = password.Hint;

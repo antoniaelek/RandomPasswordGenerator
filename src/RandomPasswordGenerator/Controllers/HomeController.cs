@@ -8,7 +8,7 @@ namespace RandomPasswordGenerator
         [HttpGet]
         public ActionResult Index()
         {
-            return new LocalRedirectResult("home");
+            return new RedirectResult("home");
         }
     }
 }

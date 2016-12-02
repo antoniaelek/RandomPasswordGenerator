@@ -84,19 +84,10 @@ namespace RandomPasswordGenerator
             });
         }
 
-        // GET api/User
-        [HttpGet]
-        [Authorize]
-        public async Task Logout()
-        {
-            Logger.Fatal(this.Request.Log());
-            await _signInManager.SignOutAsync();
-        }
-
         // POST: api/User
         [HttpPost]
         [AllowAnonymous]
-        public async Task<JsonResult> Register([FromBody]RegisterViewModel viewModel)
+        public async Task<JsonResult> Create([FromBody]RegisterViewModel viewModel)
         {
             Logger.Fatal(this.Request.Log());
             if (ModelState.IsValid)
@@ -131,56 +122,47 @@ namespace RandomPasswordGenerator
             return ret;
         }
 
-        // PUT: api/User
-        [HttpPut]
-        [AllowAnonymous]
-        public async Task<JsonResult> Login([FromBody]LoginViewModel viewModel)
+        // PUT: api/User/{id}
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<JsonResult> Update(string id,[FromBody]UpdateUserViewModel viewModel)
         {
             Logger.Fatal(this.Request.Log());
-            var key = this.Request.Headers.Keys.FirstOrDefault(h => h.ToLower() == "user-agent");
-            var browser =  "";
-            if (key != null) browser = this.Request.Headers[key];
-            Logger.Info(this.Request.Path + " " + browser);
-            if (viewModel.UserName == null && viewModel.Email == null)
-            {
-                ModelState.AddModelError("Email","Email or Username field is requried.");
-                ModelState.AddModelError("Username","Email or Username field is requried.");
-            }
-            if (ModelState.IsValid)
-            {
-                ApplicationUser user = null;
-                if (viewModel.Email != null) user = await _userManager.FindByEmailAsync(viewModel.Email);
-                else if (viewModel.UserName != null || 
-                         (user == null && viewModel.UserName != null)) 
-                    user = await _userManager.FindByNameAsync(viewModel.UserName);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == id);
+            if (user == null) return 404.ErrorStatusCode();
 
-                var result = await _signInManager.
-                    PasswordSignInAsync(user.UserName,
-                                        viewModel.Password,
-                                        viewModel.IsPersistent, false);
-                if (result.Succeeded)
-                {
-                    user = await _userManager.FindByEmailAsync(user.Email);
-                    var tmp = _userManager.GetRolesAsync(user);
-                    return new JsonResult(new
-                    {
-                        Success = true,
-                        Id = user.Id,
-                        Name = user.Name,
-                        Email = user.Email,
-                        DateCreated = user.DateCreated,
-                    });
-                }
-            }
-            if (!ModelState.Keys.Any()) 
+            var isAuthorized = await CheckUserAuthorized(user.UserName);
+            if (isAuthorized.StatusCode != 200) return 401.ErrorStatusCode();
+
+            user.Name = viewModel.Name;
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            return new JsonResult(new
             {
-                ModelState.AddModelError("Password","Invalid email or password.");
-                ModelState.AddModelError("Email","Invalid email or password.");
-            }
-            var allErrors = ModelState.ValidationErrors();
-            var ret = new JsonResult(new { Success = false, Verbose = allErrors });
-            ret.StatusCode = 400;
-            return ret;
+                Success = true,
+                Id = user.Id,
+                UserName = user.UserName,
+                Name = user.Name,
+                Email = user.Email,
+                DateCreated = user.DateCreated
+            });
+        }
+
+        // DELETE api/User/{id}
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<JsonResult> Delete(string id)
+        {
+            Logger.Fatal(this.Request.Log());
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == id);
+            if (user == null) return 404.ErrorStatusCode();
+
+            var isAuthorized = await CheckUserAuthorized(user.UserName);
+            if (isAuthorized.StatusCode != 200) return 401.ErrorStatusCode();
+
+            await _userManager.DeleteAsync(user);
+            return 200.SuccessStatusCode();
         }
 
         private async Task<JsonResult> CheckUserAuthorized(string id)

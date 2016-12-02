@@ -13,7 +13,5 @@ namespace RandomPasswordGenerator.ViewModels
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        public bool IsPersistent { get; set; }
     }
 }
