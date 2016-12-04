@@ -13,7 +13,7 @@ using NLog;
 namespace RandomPasswordGenerator
 {
     [Route("api/[controller]/")]
-    public class LoginController : Controller
+    public class SessionController : Controller
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ApplicationDbContext _context;
@@ -22,7 +22,7 @@ namespace RandomPasswordGenerator
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
         private IConfigurationRoot _configuration;
 
-        public LoginController(ApplicationDbContext context,
+        public SessionController(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILoggerFactory loggerFactory,
