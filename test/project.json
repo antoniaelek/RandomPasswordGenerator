@@ -9,7 +9,10 @@
     "dotnet-test-xunit": "1.0.0-rc2-build10015",
     "RandomPasswordGenerator": {
       "target": "project"
-    }
+    },
+    "Microsoft.AspNetCore.TestHost": "1.0.0-rc2-*",
+    "Microsoft.Net.Http": "2.2.29",
+    "System.Data.SqlClient": "4.1.0"
   },
   "testRunner": "xunit",
   "frameworks": {
