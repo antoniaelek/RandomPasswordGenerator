@@ -35,14 +35,12 @@ namespace RandomPasswordGenerator.Test
                 .AddUserSecrets();
 
             Configuration = builder.Build();
-
-            Login("jt26@cfc.uk","ktbffh");
         }
 
         [Fact]
         public async Task TestPassword() 
         {
-            //await Login("jt26@cfc.uk","ktbffh");
+            await Login("jt26@cfc.uk","ktbffh");
 
             // Post password
             var pass = new PasswordViewModel() 
@@ -54,41 +52,26 @@ namespace RandomPasswordGenerator.Test
                 Symbols = false,
                 Hint = "ktbffh"
             };
-            //var id = 0;
+            var id = 0;
             using (var response = await _client.PostAsJsonAsync("/api/password", pass))
             {
                 var responseString = await response.Content.ReadAsStringAsync();
                 dynamic res = JObject.Parse(responseString);
                 Assert.Equal(true, (bool)res.success);
-                //id = (int)res.id;
+                id = (int)res.id;
             }
+
+            // Get user's passwords
+            using (var responseGet = await _client.GetAsync("/api/user/jt26/passwords"))
+            {
+                responseGet.EnsureSuccessStatusCode();
+            }
+
+            // Delete password
+            await _client.DeleteAsync("/api/login/"+id);
         }
 
-        // [Fact]
-        // public async Task TestRegisterUser() 
-        // {
-        //     // Post user
-        //     var register = new RegisterViewModel() 
-        //     {
-        //         Email = "frankie@cfc.uk",
-        //         UserName = "frankie",
-        //         Name =  "Frank Lampard",
-        //         Password = "ktbffh"
-        //     };
-
-        //     using (var responseReg = await _client.PostAsJsonAsync("/api/user",register))
-        //     {
-        //         var responseString = await responseReg.Content.ReadAsStringAsync();
-        //         dynamic res = JObject.Parse(responseString);
-        //         // if (res.success == false)
-        //         // {
-        //         //     await Login("frankie@cfc.uk", "ktbffh");
-        //         // }
-        //         //else 
-        //         responseReg.EnsureSuccessStatusCode();
-        //     }
-        // }
-
+        [Fact]
         public async Task GetUser()
         {
             using (var responseGet = await _client.GetAsync("/api/user/jt26"))
@@ -96,7 +79,7 @@ namespace RandomPasswordGenerator.Test
                 responseGet.EnsureSuccessStatusCode();
             }
         }
-
+        
         private async Task Login (string email, string password)
         {
             var login = new LoginViewModel() 
