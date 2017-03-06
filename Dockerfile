@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:latest
+FROM microsoft/dotnet:1.1-sdk-msbuild
 
 # Copy the source and restore dependencies
 COPY . /app

@@ -67,8 +67,8 @@ namespace RandomPasswordGenerator.Test
                 responseGet.EnsureSuccessStatusCode();
             }
 
-            // Delete password
-            await _client.DeleteAsync("/api/login/"+id);
+            // Log out
+            await _client.DeleteAsync("/api/logout/"+id);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace RandomPasswordGenerator.Test
                 Email = email,
                 Password = password
             };
-            await _client.DeleteAsync("/api/login");
+            await _client.DeleteAsync("/api/logout");
             using (var responseLogin = await _client.PostAsJsonAsync("/api/login",login))
             {
                 await responseLogin.Content.ReadAsStringAsync();

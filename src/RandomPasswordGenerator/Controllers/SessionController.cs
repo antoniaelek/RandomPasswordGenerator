@@ -40,9 +40,10 @@ namespace RandomPasswordGenerator
         }
 
 
-        // DELETE api/Login
+        // DELETE api/logout
         [HttpDelete]
         [Authorize]
+        [RouteAttribute("api/logout")]
         public async Task Logout()
         {
             Logger.Fatal(this.Request.Log());
@@ -50,9 +51,10 @@ namespace RandomPasswordGenerator
         }
 
 
-        // POST: api/Login
+        // POST: api/login
         [HttpPost]
         [AllowAnonymous]
+        [RouteAttribute("api/login")]
         public async Task<JsonResult> Login([FromBody]LoginViewModel viewModel)
         {
             Logger.Fatal(this.Request.Log());
